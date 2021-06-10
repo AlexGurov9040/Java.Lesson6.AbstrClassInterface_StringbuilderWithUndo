@@ -10,52 +10,54 @@ public class UndoableStringBuilder {
     }
 
     private class DeleteAction implements Action{
+
         private int size;
 
         public DeleteAction(int size) {
+
             this.size = size;
         }
 
         public void undo(){
-            stringBuilder.delete(
-                    stringBuilder.length() - size, stringBuilder.length());
+
+            stringBuilder.delete(stringBuilder.length() - size,
+                    stringBuilder.length());
         }
     }
 
-    private StringBuilder stringBuilder; // делегат
+    private StringBuilder stringBuilder;
 
-    /**
-     * операции, обратные к выполненным.
-     * То есть при вызове append, в стек помещается
-     * операция "delete". При вызове undo() она
-     * будет выполнена.
-     */
     private Stack<Action> actions = new Stack<>();
 
-    // конструктор
+    public UndoableStringBuilder(){
+
+        stringBuilder = new StringBuilder();
+    }
+
+    public UndoableStringBuilder(int capacity){
+
+        stringBuilder = new StringBuilder(capacity);
+    }
+
     public UndoableStringBuilder(String string) {
+
         stringBuilder = new StringBuilder(string);
     }
 
-    /**
-     see @link java.lang.AbstractStringBuilder#reverse()
+    public UndoableStringBuilder(CharSequence chars){
 
-     После того, как сделан reverse(),
-     добавляем в стек операций обратную — тоже reverse().
+        stringBuilder = new StringBuilder(chars);
+    }
 
-     Далее таким же образом.
-     */
     public UndoableStringBuilder reverse() {
-        stringBuilder.reverse();
 
+        stringBuilder.reverse();
         Action action = new Action(){
             public void undo() {
                 stringBuilder.reverse();
             }
         };
-
         actions.add(action);
-
         return this;
     }
 
@@ -75,12 +77,10 @@ public class UndoableStringBuilder {
         return this;
     }
 
-    // ..... остальные перегруженые методы append пишутся аналогично (см. выше)......
-
     public UndoableStringBuilder appendCodePoint(int codePoint) {
-        int lenghtBefore = stringBuilder.length();
+        int lengthBefore = stringBuilder.length();
         stringBuilder.appendCodePoint(codePoint);
-        actions.add(new DeleteAction(stringBuilder.length() - lenghtBefore));
+        actions.add(new DeleteAction(stringBuilder.length() - lengthBefore));
         return this;
     }
 
@@ -101,23 +101,15 @@ public class UndoableStringBuilder {
     public UndoableStringBuilder replace(int start, int end, String str) {
         String deleted = stringBuilder.substring(start, end);
         stringBuilder.replace(start, end, str);
-        actions.add(() -> stringBuilder.replace(start, end, deleted));
-        return this;
-    }
-
-    public UndoableStringBuilder insert(int index, char[] str, int offset, int len) {
-        stringBuilder.insert(index, str, offset, len);
-        actions.add(() -> stringBuilder.delete(index, len));
+        actions.add(() -> stringBuilder.replace(start, end - str.length(), deleted));
         return this;
     }
 
     public UndoableStringBuilder insert(int offset, String str) {
         stringBuilder.insert(offset, str);
-        actions.add(() -> stringBuilder.delete(offset, str.length()));
+        actions.add(() -> stringBuilder.delete(offset, offset + str.length()));
         return this;
     }
-
-    // ..... остальные перегруженные методы insert пишутся аналогично (см. выше)......
 
     public void undo(){
         if(!actions.isEmpty()){
