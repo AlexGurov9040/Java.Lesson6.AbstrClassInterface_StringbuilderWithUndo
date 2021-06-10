@@ -35,14 +35,9 @@ public class StringbuilderWithUndo {
         undoableStringBuilder.replace(3,7,"p ");
         System.out.println(undoableStringBuilder);
         undoableStringBuilder.undo();
-        System.out.println(undoableStringBuilder);
-        System.out.println(undoableStringBuilder);
-        undoableStringBuilder.undo();
-        System.out.println(undoableStringBuilder);
         undoableStringBuilder.insert(3,"hello");
         System.out.println(undoableStringBuilder);
         undoableStringBuilder.undo();
         System.out.println(undoableStringBuilder);
-        System.out.println(undoableStringBuilder.toString());
     }
 }

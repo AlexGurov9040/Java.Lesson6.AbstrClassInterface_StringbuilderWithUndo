@@ -67,8 +67,7 @@ public class UndoableStringBuilder {
 
         Action action = new Action(){
             public void undo() {
-                stringBuilder.delete(
-                        stringBuilder.length() - str.length(),
+                stringBuilder.delete(stringBuilder.length() - str.length(),
                         stringBuilder.length());
             }
         };
@@ -115,9 +114,5 @@ public class UndoableStringBuilder {
         if(!actions.isEmpty()){
             actions.pop().undo();
         }
-    }
-
-    public String toString() {
-        return stringBuilder.toString();
     }
 }
